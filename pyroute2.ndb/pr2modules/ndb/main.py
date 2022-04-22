@@ -1167,12 +1167,11 @@ class NDB(object):
                 elif self._db_provider == 'psycopg2':
                     self._db = psycopg2.connect(**self._db_spec)
 
-            self.schema = schema.init(
-                self,
-                self._db,
-                self._db_provider,
-                self._db_rtnl_log,
-                id(threading.current_thread()),
+            dbconfig = schema.DBConfig()
+            dbconfig.provider = schema.DBProvider(self._db_provider)
+            dbconfig.spec = self._db_spec
+            self.schema = schema.DBSchema(
+                dbconfig, self._db_rtnl_log, self.log.channel('schema')
             )
         except Exception as e:
             self._dbm_error = e
